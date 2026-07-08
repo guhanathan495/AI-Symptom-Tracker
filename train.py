@@ -38,3 +38,20 @@ model_cancer.fit(X_train_c, y_train_c)
 joblib.dump(model_cancer, 'breast_cancer_model.pkl')
 print("Cancer Model Trained Successfully!")
 print("All 3 Models Ready!")
+
+# ==========================================
+# 4. MODEL 4: Diabetes Risk Predictor
+# ==========================================
+from sklearn.datasets import load_diabetes
+diabetes_data = load_diabetes()
+X_diabetes = pd.DataFrame(diabetes_data.data, columns=diabetes_data.feature_names)
+# Convert target to binary classification (1 for risk, 0 for normal)
+y_diabetes = (diabetes_data.target > np.median(diabetes_data.target)).astype(int)
+
+X_train_d, X_test_d, y_train_d, y_test_d = train_test_split(X_diabetes, y_diabetes, test_size=0.2, random_state=42)
+model_diabetes = RandomForestClassifier(n_estimators=100, random_state=42)
+model_diabetes.fit(X_train_d, y_train_d)
+joblib.dump(model_diabetes, 'diabetes_model.pkl')
+print(f"Diabetes Model Trained! Accuracy: {model_diabetes.score(X_test_d, y_test_d)*100:.2f}%")
+print("All 4 Models Trained Successfully!")
+

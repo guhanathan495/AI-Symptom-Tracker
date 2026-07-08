@@ -7,7 +7,8 @@ st.set_page_config(page_title="Healthcare AI Hub", page_icon="🩺", layout="cen
 st.title("🏥 Multi-Specialty Healthcare AI Portal")
 st.write("Verifiable Medical Intelligence Models for Clinical Decision Support.")
 
-tab1, tab2, tab3 = st.tabs(["🩺 Symptom Tracker", "❤️ Heart Risk Predictor", "🎗️ Breast Cancer Analytics"])
+tab1, tab2, tab3, tab4 = st.tabs(["🩺 Symptom Tracker", "❤️ Heart Risk Predictor", "🎗️ Breast Cancer Analytics", "🩸 Diabetes Risk Predictor"])
+
 
 # TAB 1: SYMPTOM TRACKER
 with tab1:
@@ -76,3 +77,29 @@ with tab3:
             
 st.markdown("---")
 st.info("💡 *Disclaimer: Built for job fair verification. Consult professionals for healthcare decisions.*")
+
+# ==========================================
+# TAB 4: DIABETES RISK PREDICTOR
+# ==========================================
+with tab4:
+    st.subheader("Diabetes Metabolism Risk Assessment")
+    try:
+        model_d = joblib.load('diabetes_model.pkl')
+        
+        st.write("Input patient physiological data indicators below:")
+        d_age = st.slider("Patient Age Scale", 0.0, 1.0, 0.5)
+        d_bmi = st.slider("Body Mass Index (BMI) Scale", 0.0, 1.0, 0.5)
+        d_bp = st.slider("Blood Pressure (BP) Scale", 0.0, 1.0, 0.5)
+        d_glu = st.slider("Blood Glucose Level Scale", 0.0, 1.0, 0.5)
+
+        if st.button("Evaluate Diabetes Risk", type="primary"):
+            # Pad remaining 6 metadata features for the sklearn dataset mapping
+            base_diabetes = [d_age, 0.0, d_bmi, d_bp] + [0.0]*5 + [d_glu]
+            pred_d = model_d.predict(np.array([base_diabetes]))
+            
+            if pred_d == 1:
+                st.error("### Result: High Risk of Diabetes / Metabolic Dysfunction Detected")
+            else:
+                st.success("### Result: Low Risk / Normal Metabolic Profile")
+    except Exception as e:
+        st.warning("Please run train.py first to generate the Diabetes model file.")
