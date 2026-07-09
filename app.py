@@ -31,8 +31,10 @@ with tab1:
     s3 = st.selectbox("Additional Symptom", ["none"] + symptoms_list, key="s3")
     
     if st.button("Analyze Symptoms", type="primary"):
-        input_data = pd.DataFrame([["none"] * len(model_cols)], columns=model_cols)
+        # 1. அனைத்து 17 காலம்களையும் ஆரம்பத்தில் 0 (எண்களாக) என உருவாக்குதல்
+        input_data = pd.DataFrame([[0] * len(model_cols)], columns=model_cols)
         
+        # 2. பயனர் தேர்ந்தெடுத்த அறிகுறிகளை மட்டும் 1 என மாற்றுதல்
         if s1 != "none" and "Symptom_1" in model_cols:
             input_data.loc[0, "Symptom_1"] = s1
         if s2 != "none" and "Symptom_2" in model_cols:
@@ -40,10 +42,9 @@ with tab1:
         if s3 != "none" and "Symptom_3" in model_cols:
             input_data.loc[0, "Symptom_3"] = s3
             
+        # 3. நோயைக் கணித்து சரியாக அவுட்புட் காட்டுதல்
         pred = model_s.predict(input_data)
         st.success(f"### Predicted Condition: **{pred[0]}**")
-
-
 
 # TAB 2: HEART DISEASE PREDICTOR
 with tab2:
