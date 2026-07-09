@@ -13,26 +13,37 @@ tab1, tab2, tab3, tab4 = st.tabs(["🩺 Symptom Tracker", "❤️ Heart Risk Pre
 # TAB 1: SYMPTOM TRACKER
 with tab1:
     st.subheader("AI Medical Symptom Risk Assessment")
+    
     model_s = joblib.load('symptom_tracker_model.pkl')
     model_cols = joblib.load('model_columns.pkl')
-    symptoms_set = set()
-    for col in model_cols:
-        if '_' in col:
-            parts = col.split('_')
-            symptoms_set.add("_".join(parts[2:]) if len(parts) > 2 else parts[-1])
-    symptoms_list = sorted(list(symptoms_set))
+    
+    df_symptoms = pd.read_csv('DiseaseAndSymptoms.csv')
+    
+    all_symptoms = set()
+    symptom_cols = [c for c in df_symptoms.columns if 'Symptom_' in c]
+    for col in symptom_cols:
+        all_symptoms.update(df_symptoms[col].dropna().unique())
+    
+    symptoms_list = sorted([str(s).strip() for s in all_symptoms if str(s).strip() != '' and str(s).lower() != 'nan'])
+
     s1 = st.selectbox("Primary Symptom", ["none"] + symptoms_list, key="s1")
     s2 = st.selectbox("Secondary Symptom", ["none"] + symptoms_list, key="s2")
     s3 = st.selectbox("Additional Symptom", ["none"] + symptoms_list, key="s3")
+    
     if st.button("Analyze Symptoms", type="primary"):
-        input_data = pd.DataFrame(0, index=[0], columns=model_cols)
-        for i, sym in enumerate([s1, s2, s3]):
-            if sym != "none":
-                col_name = f"Symptom_{i+1}_{sym}"
-                if col_name in input_data.columns:
-                    input_data.loc[0, col_name] = 1
+        input_data = pd.DataFrame([["none"] * len(model_cols)], columns=model_cols)
+        
+        if s1 != "none" and "Symptom_1" in model_cols:
+            input_data.loc[0, "Symptom_1"] = s1
+        if s2 != "none" and "Symptom_2" in model_cols:
+            input_data.loc[0, "Symptom_2"] = s2
+        if s3 != "none" and "Symptom_3" in model_cols:
+            input_data.loc[0, "Symptom_3"] = s3
+            
         pred = model_s.predict(input_data)
         st.success(f"### Predicted Condition: **{pred[0]}**")
+
+
 
 # TAB 2: HEART DISEASE PREDICTOR
 with tab2:
