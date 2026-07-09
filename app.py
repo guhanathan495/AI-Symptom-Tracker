@@ -106,6 +106,9 @@ with tab3:
 # ==========================================
 # TAB 4: DIABETES RISK PREDICTOR
 # ==========================================
+# ==========================================
+# TAB 4: DIABETES RISK PREDICTOR
+# ==========================================
 with tab4:
     st.subheader("Diabetes Metabolism Risk Assessment")
     try:
@@ -117,14 +120,22 @@ with tab4:
         d_glu = st.slider("Blood Glucose Level Scale", 0.0, 1.0, 0.5)
 
         if st.button("Evaluate Diabetes Risk", type="primary"):
-            base_diabetes = [d_age, 0.0, d_bmi, d_bp] + [0.0]*5 + [d_glu]
-            pred_d = model_d.predict(np.array([base_diabetes]))
-            if pred_d[0] == 1:
-                st.error("### Result: High Risk of Diabetes / Metabolic Dysfunction Detected")
-            else:
+            avg_input = (d_age + d_bmi + d_bp + d_glu) / 4.0
+            
+            if avg_input < 0.3:
                 st.success("### Result: Low Risk / Normal Metabolic Profile")
+            else:
+                base_diabetes = [d_age, 0.0, d_bmi, d_bp] + [0.0]*5 + [d_glu]
+                pred_d = model_d.predict(np.array([base_diabetes]))
+                
+                if pred_d == 1:
+                    st.error("### Result: High Risk of Diabetes / Metabolic Dysfunction Detected")
+                else:
+                    st.success("### Result: Low Risk / Normal Metabolic Profile")
     except Exception as e:
         st.warning("Please run train.py first to generate the Diabetes model file.")
 
 st.markdown("---")
 st.info("💡 *Disclaimer: Built for job fair verification. Consult professionals for healthcare decisions.*")
+
+
