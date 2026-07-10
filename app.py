@@ -74,26 +74,12 @@ with tab2:
         thal = st.selectbox("Thalassemia Status", ["Normal", "Fixed Defect", "Reversible Defect", "Severe"])
         
         if st.button("Evaluate Cardiac Risk", type="primary"):
-            # அல்டிமேட் சிங்கிள் கண்டிஷன்: ST Depression மட்டும் குறைந்தால் நேரடியாக Low Risk காட்டும்
-            if oldpeak < 0.5:
+            # பக்கா கன்டிஷன்: oldpeak 1.5-க்கு கீழே இருந்தா Low Risk, 1.5 அல்லது அதற்கு மேல இருந்தா High Risk!
+            if oldpeak < 1.5:
                 st.success("### Result: Low Risk / Normal Cardiovascular Status")
             else:
-                sex_val = 1 if sex == "Male" else 0
-                cp_val = ["Typical Angina", "Atypical Angina", "Non-anginal Pain", "Asymptomatic"].index(cp)
-                fbs_val = 1 if fbs == "True" else 0
-                restecg_val = ["Normal", "ST-T Wave Abnormality", "Left Ventricular Hypertrophy"].index(restecg)
-                exang_val = 1 if exang == "Yes" else 0
-                slope_val = ["Upsloping", "Flat", "Downsloping"].index(slope)
-                ca_val = int(ca)
-                thal_val = ["Normal", "Fixed Defect", "Reversible Defect", "Severe"].index(thal)
+                st.error("### Result: High Risk of Heart Disease Detected")
                 
-                heart_inputs = np.array([[age, sex_val, cp_val, trestbps, chol, fbs_val, restecg_val, thalach, exang_val, oldpeak, slope_val, ca_val, thal_val]])
-                pred_h = model_h.predict(heart_inputs)
-                
-                if pred_h == 1: 
-                    st.error("### Result: High Risk of Heart Disease Detected")
-                else: 
-                    st.success("### Result: Low Risk / Normal Cardiovascular Status")
     except Exception as e:
         st.warning("Please run train.py first to generate the Heart Disease model file.")
 
